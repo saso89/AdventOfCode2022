@@ -4,32 +4,33 @@ import sys
 from functools import cache
 
 @cache
-def solve(pos, time, opened):
+def resitev(pos, time, opened):
     if time == 0:
         return 0
 
-    #hoja po valvih in i��emo najve�ji score
-    score = max(solve(n, time - 1, opened) for n in maps[pos])
+    #hoja po ventilih in iskanje največjega pristika, ki ga lahko sprostimo z odpiranjem ventilov
+    rezultat = max(resitev(n, time - 1, opened) for n in mapa[pos])
 
-    #�e je flow rate ve�ji od 0 potem ima smisel da ga odpremo
-    if flows[pos] > 0 and pos not in opened:
-        #pretvorimo v navadni set ker frozenset ne dovoli dodajanja
-        new_opened = set(opened)
-        new_opened.add(pos)
+    #odpiramo samo tiste ventile, kjer je hitrost pretoka večja od 0 in še niso bili odprti
+    if pretok[pos] > 0 and pos not in opened:
+        #pretvorba v navadni set ker frozenset ne dovoli dodajanja - mutability
+        noviset_odprti = set(opened)
+        noviset_odprti.add(pos)
 
-        #zmno�imo preostali �as in flow rate ter rekurzivno kli�emo preostale minute. Vrnemo max score
-        score = max(score, (time - 1) * flows[pos] + solve(pos, time - 1, frozenset(new_opened)))
-    return score
+        #zmnožimo preostali čas in hitrost pretoka ter rekurzivno kličemo preostale minute. 
+        #vrnemo največji rezultat
+        rezultat = max(rezultat, (time - 1) * pretok[pos] + resitev(pos, time - 1, frozenset(noviset_odprti)))
+    return rezultat
 
-content = [line.replace("\n","") for line in open("day_16.txt", encoding="utf8").readlines()]
-flows = {}
-maps = {}
+podatki = [line.replace("\n","") for line in open("day_16.txt", encoding="utf8").readlines()]
+pretok = {}
+mapa = {}
 
-#parsanje podatkov
-for line in content:
+# urejanje podatkov
+for line in podatki:
     splittedLine = line.split(" ")
-    valve = splittedLine[1]
-    flows[valve] = int(splittedLine[4].split("=")[1].strip(";"))
-    maps[valve] = [t.strip(',') for t in splittedLine[9:]]
+    ventil = splittedLine[1]
+    pretok[ventil] = int(splittedLine[4].split("=")[1].strip(";"))
+    mapa[ventil] = [t.strip(',') for t in splittedLine[9:]]
 
-print(solve('AA', 30, frozenset()))
+print(resitev('AA', 30, frozenset()))
