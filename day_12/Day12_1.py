@@ -1,26 +1,27 @@
 #Day 12:
 #Part 1
 from collections import deque
-content = open("day_12.txt", encoding="utf8").readlines()
-grid = []
+podatki = open("day_12.txt", encoding="utf8").readlines()
+mreza = []
 
-#preberemo in shranimo v seznam (matrika)
-for line in content:
-    grid.append(list(line.replace('\n', '')))
+# preberemo in shranimo v seznam (matrika)
+for line in podatki:
+    mreza.append(list(line.replace('\n', '')))
 
-#začetno pozicijo nastavimo kot a in končno pozicijo kot z
-for i, row in enumerate(grid):
+# začetni položaj je a - najnižja višina in trenutni položaj (S)
+# končni položaj z najboljšim signalom (E) je z - najvišja višina
+for i, row in enumerate(mreza):
     for j, item in enumerate(row):
         if item == "S":
             sx = i
             sy = j
-            grid[i][j] = "a"
+            mreza[i][j] = "a"
         if item == "E":
             ex = i
             ey = j
-            grid[i][j] = "z"
+            mreza[i][j] = "z"
 
-#definiramo vrsto in vanjo dodamo začetno koordinato
+# definiramo vrsto in vanjo dodamo začetno koordinato
 q = deque()
 q.append((0, sx, sy))
 
@@ -30,11 +31,11 @@ visited = {(sx, sy)}
 while q:
     distance, x1, y1 = q.popleft()
     for x2, y2 in [(x1 + 1, y1), (x1 - 1, y1), (x1, y1 + 1), (x1, y1 - 1)]:
-        if x2 < 0 or y2 < 0 or x2 >= len(grid) or y2 >= len(grid[0]):
+        if x2 < 0 or y2 < 0 or x2 >= len(mreza) or y2 >= len(mreza[0]):
             continue
         if (x2, y2) in visited:
             continue
-        if ord(grid[x2][y2]) - ord(grid[x1][y1]) > 1:
+        if ord(mreza[x2][y2]) - ord(mreza[x1][y1]) > 1:
             continue
         if x2 == ex and y2 == ey:
             print(distance + 1)
